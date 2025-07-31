@@ -305,6 +305,7 @@ public:
             if (hdrSurface->colorSurface) {
                 hasFormat &= std::ranges::find(hdrSurface->supportedPrimaries, desc.primaries) != hdrSurface->supportedPrimaries.end();
                 hasFormat &= std::ranges::find(hdrSurface->supportedTransferFunctions, desc.transferFunction) != hdrSurface->supportedTransferFunctions.end();
+                hasFormat &= !desc.extended_volume || std::ranges::find(hdrSurface->supportedFeatures, WP_COLOR_MANAGER_V1_FEATURE_EXTENDED_TARGET_VOLUME) != hdrSurface->supportedFeatures.end();
             }
             if (hasFormat) {
                 fprintf(stderr, "[HDR Layer] Enabling format: %u colorspace: %u\n", desc.surface.surfaceFormat.format, desc.surface.surfaceFormat.colorSpace);
