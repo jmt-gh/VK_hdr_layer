@@ -9,20 +9,30 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:trixie
     steps:
+      - name: Install git and certs
+        run: |
+          apt-get update
+          apt-get install -y git ca-certificates
+
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      
       - uses: actions/checkout@v4
         with:
           submodules: recursive
       
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
-          apt-get update
           apt-get install -y meson ninja-build libvulkan-dev libwayland-dev wayland-protocols pkg-config
       
       - name: Build
         run: |
-          meson setup build --prefix=/usr
+          meson setup build --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu
           ninja -C build
           DESTDIR=$GITHUB_WORKSPACE/install ninja -C build install
+      
+      - name: Show installed files
+        run: find $GITHUB_WORKSPACE/install -type f
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
