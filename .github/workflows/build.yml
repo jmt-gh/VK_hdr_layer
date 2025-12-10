@@ -1,0 +1,29 @@
+name: Build VK_hdr_layer
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y meson ninja-build libvulkan-dev libwayland-dev wayland-protocols pkg-config
+      
+      - name: Build
+        run: |
+          meson setup build --prefix=/usr
+          ninja -C build
+          DESTDIR=$GITHUB_WORKSPACE/install ninja -C build install
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vk-hdr-layer
+          path: install/
